@@ -95,12 +95,14 @@ class Tree:
                             if duration > 0:
                                 seg = BranchSegment(duration, i)
                                 node.segments.append(seg)
-                            t += p
+                            #t += p
+                            t += duration
                         if t > anc:
                             break
                 else:
                     node.segments = [BranchSegment(node.length, 0)]
-                #print node.label, anc, des, node.length, [ s.duration for s in node.segments ]
+                ## if len(node.segments)>1:
+                ##     print node.label, anc, des, node.length, [ s.duration for s in node.segments ]
 
     def length2root(self, node):
         n = node
@@ -229,7 +231,7 @@ def conditionals(node):
         model = seg.model
         #if not seg.distrange:
         if seg.startdist:
-            seg.distrange = (model.dist2i[seg.startdist],)
+            seg.distrange = [0, model.dist2i[seg.startdist]]
         elif seg.fossils:
             # seg.fossils is a list of area indices
             #print "fossils at node %s: %s" % (node.label, seg.fossils)
@@ -250,7 +252,7 @@ def conditionals(node):
             #print "ranges excluded: %s" % excluded
             #sys.exit()
         else:
-            seg.distrange = list(model.distrange)
+            seg.distrange = model.distrange
 
     ## for seg in node.segments:
     ##     seg.dist_conditionals = distconds
@@ -267,7 +269,7 @@ def conditionals(node):
         for i in seg.distrange:
             # P[i] is the vector of probabilities of going from dist i
             # to all other dists
-            v[i] = sum(distconds * P[i])
+            v[i] = sum(seg.dist_conditionals * P[i])
         distconds = v
     return distconds
 
@@ -300,7 +302,8 @@ def ancdist_conditional_lh(node):
                 for ancsplit in model.iter_ancsplits(dist):
                     d1, d2 = ancsplit.descdists
                     lh_part = (v1[dist2i[d1]] * v2[dist2i[d2]])
-                    lh += (lh_part * ancsplit.weight)
+                    lh_part *= ancsplit.weight
+                    lh += (lh_part)
                     ancsplit.likelihood = lh_part
                     ancsplits.append(ancsplit)
             distconds[distidx] = lh

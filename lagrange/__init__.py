@@ -5,9 +5,8 @@ VERSION = file(
 
 msg = """Lagrange: likelihood analysis of geographic range evolution
 Version: %s
-Authors: Richard Ree <rree@fieldmuseum.org>
-         Stephen Smith <sasmith@nescent.org>
-http://lagrange.googlecode.com
+Author: Richard Ree <rree@fieldmuseum.org>
+https://github.com/rhr/lagrange-python
 """ % VERSION
 
 import input, output, nchoosem, optimize, ascii, newick, phylo, decmodel_mp
