@@ -1,5 +1,6 @@
 import sys, random, time
 import scipy
+from scipy import sum
 import scipy.linalg
 array = scipy.array
 transpose = scipy.transpose
@@ -56,7 +57,8 @@ def Q2P_old(Q, t):
     return P
 
 def Q2P(Q, t):
-    return linalg.expm(Q*t)
+    p = linalg.expm(Q*t)
+    return p/sum(p,1)
 
 def binP(pi0, t):
     pi1 = 1.0 - pi0
