@@ -20,5 +20,6 @@ setup(
     author='Richard Ree',
     author_email='rree@fieldmuseum.org',
     url='https://github.com/rhr/lagrange-python',
-    packages=['lagrange']
+    packages=['lagrange'],
+    package_data={'lagrange': ['VERSION']}
     )
