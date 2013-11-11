@@ -234,7 +234,7 @@ def conditionals(node):
             seg.distrange = [0, model.dist2i[seg.startdist]]
         elif seg.fossils:
             # seg.fossils is a list of area indices
-            print "fossils at node %s: %s" % (node.label, seg.fossils)
+            ## print "fossils at node %s: %s" % (node.label, seg.fossils)
             distrange = list(model.distrange)
             excluded = []
             # filter out ranges inconsistent with fossil area(s)
