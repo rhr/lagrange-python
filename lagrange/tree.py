@@ -234,7 +234,7 @@ def conditionals(node):
             seg.distrange = [0, model.dist2i[seg.startdist]]
         elif seg.fossils:
             # seg.fossils is a list of area indices
-            #print "fossils at node %s: %s" % (node.label, seg.fossils)
+            print "fossils at node %s: %s" % (node.label, seg.fossils)
             distrange = list(model.distrange)
             excluded = []
             # filter out ranges inconsistent with fossil area(s)
@@ -243,9 +243,11 @@ def conditionals(node):
                 for x in seg.fossils:
                     if x not in dist:
                         flag = False
-                # flag is True if dist does not include all areas in
+                        break
+                # flag is False if dist does not include all areas in
                 # seg.fossils
-                if flag:
+                if flag is False:
+                    #print 'removing', i, model.dists[i]
                     distrange.remove(i)
                     excluded.append(i)
             seg.distrange = distrange
