@@ -79,7 +79,7 @@ class DECModel:
         self.dp_range = range(int(max(self.dp_array.flat)))
 
         self.params = [0.01, 0.01]
-        self.params += [1.0]*max(self.dp_array.flat)
+        # self.params += [1.0]*max(self.dp_array.flat)
         self.setup_D()
         self.setup_E()
         #t = time.time()
