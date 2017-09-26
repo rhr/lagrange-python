@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import print_function
 import sys, string, time
 import scipy
 import rates
@@ -79,7 +80,9 @@ class DECModel:
         self.dp_range = range(int(max(self.dp_array.flat)))
 
         self.params = [0.01, 0.01]
-        self.params += [1.0]*max(self.dp_array.flat)
+        m = int(max(self.dp_array.flat))
+        if m:
+            self.params += [1.0]*m
         self.setup_D()
         self.setup_E()
         #t = time.time()
@@ -406,7 +409,7 @@ def test_conditionals(distconds, seglens, model):
     """
     distrange = model.distrange
     for p, seglen in enumerate(seglens):
-        print "distconds", distconds
+        ## print "distconds", distconds
         P = model.P(p, seglen)
         v = scipy.zeros((model.ndists,))
         for i in distrange:
@@ -462,11 +465,11 @@ if __name__ == "__main__":
     import time
     t = time.time()
     m1 = DECModel(8)
-    print time.time() - t, "to create v1"
+    ## print time.time() - t, "to create v1"
     from pprint import pprint
     t = time.time()
     pprint(m1.P(0, 1.33))
-    print time.time() - t, "to expoentiate"
+    ## print time.time() - t, "to expoentiate"
     ## import scipy.sparse
     ## print m.Q[0].shape
     ## coo = scipy.sparse.coo_matrix(m.Q[0])
