@@ -58,25 +58,25 @@ class DECModel:
 
         # instantiate a matrix for each period
         # of nareas x nareas
-        self.Dmask = scipy.ones((self.nperiods, nareas, nareas))
+        self.Dmask = scipy.ones((self.nperiods, nareas, nareas), dtype=int)
         if Dmask is not None:
             # make sure default Dmask has correct dimensions
             assert Dmask.shape == (self.nperiods, nareas, nareas)
             self.Dmask = Dmask
 
-        self.Emask = scipy.ones((self.nperiods, nareas))
+        self.Emask = scipy.ones((self.nperiods, nareas), dtype=int)
         if Emask is not None:
             # make sure default Dmask has correct dimensions
             assert Emask.shape == (self.nperiods, nareas)
             self.Emask = Emask
 
         if dp_array is None:
-            self.dp_array = scipy.zeros((self.nperiods, nareas, nareas))
+            self.dp_array = scipy.zeros((self.nperiods, nareas, nareas), dtype=int)
         else:
             self.dp_array = scipy.array(dp_array)
             assert self.dp_array.shape == self.Dmask.shape
         self.dp_array_nonzero = self.dp_array.nonzero()
-        self.dp_range = range(int(max(self.dp_array.flat)))
+        self.dp_range = range(max(self.dp_array.flat))
 
         self.params = [0.01, 0.01]
         self.params += [1.0]*max(self.dp_array.flat)
