@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+from __future__ import print_function
 import sys, string, time
 import scipy
-import rates
-import nchoosem
+from . import rates
+from . import nchoosem
 
 # dists are ordered tuples of area indices
 
@@ -80,6 +80,7 @@ class DECModel:
 
         self.params = [0.01, 0.01]
         self.params += [1.0]*max(self.dp_array.flat)
+        print(list(self.dp_array.flat))
         self.setup_D()
         self.setup_E()
         #t = time.time()
@@ -344,6 +345,9 @@ class Ancsplit:
     def __cmp__(self, other):
         return cmp(self.likelihood, other.likelihood)
 
+    def __lt__(self, other):
+        return self.likelihood<other.likelihood
+
 #
 # utility functions
 #
@@ -406,7 +410,7 @@ def test_conditionals(distconds, seglens, model):
     """
     distrange = model.distrange
     for p, seglen in enumerate(seglens):
-        print "distconds", distconds
+        print("distconds", distconds)
         P = model.P(p, seglen)
         v = scipy.zeros((model.ndists,))
         for i in distrange:
@@ -431,50 +435,50 @@ def nondiag_indices(m):
                 ind += 1
 
 
-if __name__ == "__main__":
-    ## from pprint import pprint
-    ## n = 7
-    ## cmat = scipy.ones((n,n))
-    ## for i, j in ((1,4),(1,7),
-    ##              (2,6),(2,7),
-    ##              (3,6),(3,7),
-    ##              (4,5),
-    ##              (5,6),):
-    ##     cmat[i-1,j-1] = 0
-    ##     cmat[j-1,i-1] = 0
-    ## pprint(cmat)
-    #pprint(list(nchoosem.dists_by_maxsize(n,4)))
+## if __name__ == "__main__":
+##     ## from pprint import pprint
+##     ## n = 7
+##     ## cmat = scipy.ones((n,n))
+##     ## for i, j in ((1,4),(1,7),
+##     ##              (2,6),(2,7),
+##     ##              (3,6),(3,7),
+##     ##              (4,5),
+##     ##              (5,6),):
+##     ##     cmat[i-1,j-1] = 0
+##     ##     cmat[j-1,i-1] = 0
+##     ## pprint(cmat)
+##     #pprint(list(nchoosem.dists_by_maxsize(n,4)))
 
 
-## for x in nondiag_indices(scipy.zeros([6,6])):
-##     print x
-## sys.exit()
+## ## for x in nondiag_indices(scipy.zeros([6,6])):
+## ##     print x
+## ## sys.exit()
 
-## m = RateModelGE(4)
-## s = set()
-## for i, d in m.enumerate_dists():
-##     for as in iter_ancsplits(d):
-##         if as.descdists not in s:
-##             s.add(as.descdists)
-##         else:
-##             print "!", as.descdists
+## ## m = RateModelGE(4)
+## ## s = set()
+## ## for i, d in m.enumerate_dists():
+## ##     for as in iter_ancsplits(d):
+## ##         if as.descdists not in s:
+## ##             s.add(as.descdists)
+## ##         else:
+## ##             print "!", as.descdists
 
-    import time
-    t = time.time()
-    m1 = DECModel(8)
-    print time.time() - t, "to create v1"
-    from pprint import pprint
-    t = time.time()
-    pprint(m1.P(0, 1.33))
-    print time.time() - t, "to expoentiate"
-    ## import scipy.sparse
-    ## print m.Q[0].shape
-    ## coo = scipy.sparse.coo_matrix(m.Q[0])
-    ## print coo
-    ## sys.exit()
-    ## t = time.time()
-    ## pprint(rates.Q2P(m.Q[0], 1.0))
-    ## print time.time() - t, "for Q2P"
-    ## t = time.time()
-    ## pprint(rates.q2p_test(m.Q[0], 1.0))
-    ## print time.time() - t, "for q2p_test"
+##     import time
+##     t = time.time()
+##     m1 = DECModel(8)
+##     print time.time() - t, "to create v1"
+##     from pprint import pprint
+##     t = time.time()
+##     pprint(m1.P(0, 1.33))
+##     print time.time() - t, "to expoentiate"
+##     ## import scipy.sparse
+##     ## print m.Q[0].shape
+##     ## coo = scipy.sparse.coo_matrix(m.Q[0])
+##     ## print coo
+##     ## sys.exit()
+##     ## t = time.time()
+##     ## pprint(rates.Q2P(m.Q[0], 1.0))
+##     ## print time.time() - t, "for Q2P"
+##     ## t = time.time()
+##     ## pprint(rates.q2p_test(m.Q[0], 1.0))
+##     ## print time.time() - t, "for q2p_test"

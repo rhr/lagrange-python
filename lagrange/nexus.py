@@ -20,7 +20,7 @@ import os,sys, math, random, copy
 #from Bio.Data import IUPACData
 #from Bio.Seq import Seq
 
-import newick
+from . import newick
 
 #from Trees import Tree,NodeData
 
@@ -402,8 +402,9 @@ def _kill_comments_and_break_lines(text):
                 speciallevel=False
             else:
                 commlevel-=1
-                if commlevel<0:
-                    raise NexusError, 'Nexus formatting error: unmatched ]'
+                assert commlevel>=0, 'Nexus formatting error: unmatched ]'
+                ## if commlevel<0:
+                ##     raise NexusError, 'Nexus formatting error: unmatched ]'
                 continue 
         if commlevel==0:                        # copy if we're not in comment
             if t==';' and not quotelevel:
@@ -414,8 +415,9 @@ def _kill_comments_and_break_lines(text):
     #level of comments should be 0 at the end of the file
     if newline:
         newtext.append('\n'.join(newline))
-    if commlevel>0:
-        raise NexusError, 'Nexus formatting error: unmatched ['
+    assert commlevel<=0, 'Nexus formatting error: unmatched ['
+    ## if commlevel>0:
+    ##     raise NexusError, 'Nexus formatting error: unmatched ['
     return newtext
 
 
@@ -444,10 +446,12 @@ def _replace_parenthesized_ambigs(seq,rev_ambig_values):
     opening=seq.find('(')
     while opening>-1:
         closing=seq.find(')')
-        if closing<0:
-            raise NexusError, 'Missing closing parenthesis in: '+seq
-        elif closing<opening:
-            raise NexusError, 'Missing opening parenthesis in: '+seq
+        assert closing>=0, 'Missing closing parenthesis in: '+seq
+        ## if closing<0:
+        ##     raise NexusError, 'Missing closing parenthesis in: '+seq
+        assert closing>=opening, 'Missing opening parenthesis in: '+seq
+        ## elif closing<opening:
+        ##     raise NexusError, 'Missing opening parenthesis in: '+seq
         ambig=[x for x in seq[opening+1:closing]]
         ambig.sort()
         ambig=''.join(ambig)
@@ -491,7 +495,8 @@ class Commandline:
                     for token in token_indices:
                         self.options[options[token].lower()] = None
                 except ValueError:
-                    raise NexusError, 'Incorrect formatting in line: %s' % line
+                    raise ValueError('Incorrect formatting in line: %s' % line)
+                    ## raise NexusError, 'Incorrect formatting in line: %s' % line
                 
 class Block:
     """Represent a NEXUS block with block name and list of commandlines ."""
@@ -501,7 +506,7 @@ class Block:
 
 class Nexus(object):
 
-    __slots__=['original_taxon_order','__dict__']
+    ## __slots__=['original_taxon_order','__dict__']
 
     def __init__(self, input=None):
         self.ntax=0                     # number of taxa
@@ -575,13 +580,13 @@ class Nexus(object):
                 else:
                     self.filename='Unknown_nexus_file'
             else:
-                print input.strip()[:6]
-                raise NexusError, 'Unrecognized input: %s ...' % input[:100]
+                print(input.strip()[:6])
+                raise NexusError('Unrecognized input: %s ...' % input[:100])
         if C:
             decommented=cnexus.scanfile(file_contents)
             #check for unmatched parentheses
             if decommented=='[' or decommented==']':
-                raise NexusError, 'Unmatched %s' % decommented
+                raise NexusError('Unmatched %s' % decommented)
             # cnexus can't return lists, so in analogy we separate commandlines with chr(7)
             # (a character that shoudn't be part of a nexus file under normal circumstances)
             commandlines=_adjust_lines(decommented.split(chr(7)))
@@ -645,7 +650,7 @@ class Nexus(object):
                 getattr(self,'_'+line.command)(line.options)
             except AttributeError:
                 raise
-                raise NexusError, 'Unknown command: %s ' % line.command
+                raise NexusError('Unknown command: %s ' % line.command)
     
     def _dimensions(self,options):
         if options.has_key('ntax'):
@@ -691,7 +696,7 @@ class Nexus(object):
                 #    self.symbols='01' # if nothing else defined, then 0 and 1 are the default states
                 #self.unambiguous_letters=self.symbols
             else:
-                raise NexusError, 'Unsupported datatype: '+self.datatype
+                raise NexusError('Unsupported datatype: '+self.datatype)
             self.valid_characters=''.join(self.ambiguous_values.keys())+self.unambiguous_letters
             if not self.respectcase:
                 self.valid_characters=self.valid_characters.lower()+self.valid_characters.upper()
@@ -723,7 +728,7 @@ class Nexus(object):
         if options.has_key('labels'):
             self.labels=options['labels']
         if options.has_key('transpose'):
-            raise NexusError, 'TRANSPOSE is not supported!'
+            raise NexusError('TRANSPOSE is not supported!')
             self.transpose=True
         if options.has_key('interleave'):
             if options['interleave']==None or options['interleave'].lower()=='yes':
@@ -778,11 +783,11 @@ class Nexus(object):
                 if c is None:
                     break
                 elif c!=',':
-                    raise NexusError,'Missing \',\' in line %s.' % options
+                    raise NexusError('Missing \',\' in line %s.' % options)
             except NexusError:
                 raise
             except:
-                raise NexusError,'Format error in line %s.' % options
+                raise NexusError('Format error in line %s.' % options)
 
     def _charstatelabels(self,options):
         # warning: charstatelabels supports only charlabels-syntax!
@@ -795,22 +800,22 @@ class Nexus(object):
 
     def _matrix(self,options):
         if not self.ntax or not self.nchar:
-            raise NexusError,'Dimensions must be specified before matrix!'
+            raise NexusError('Dimensions must be specified before matrix!')
         taxlabels_present=(self.taxlabels!=[])
         self.matrix={}
         taxcount=0
         block_interleave=0
         #eliminate empty lines and leading/trailing whitespace 
-        lines=[l.strip() for l in options.split('\n') if l.strip()<>'']
+        lines=[l.strip() for l in options.split('\n') if l.strip()!='']
         lineiter=iter(lines)
         while 1:
             try:
                 l=lineiter.next()
             except StopIteration:
                 if taxcount<self.ntax:
-                    raise NexusError, 'Not enough taxa in matrix.'
+                    raise NexusError('Not enough taxa in matrix.')
                 elif taxcount>self.ntax:
-                    raise NexusError, 'Too many taxa in matrix.'
+                    raise NexusError('Too many taxa in matrix.')
                 else:
                     break
             # count the taxa and check for interleaved matrix
@@ -818,7 +823,7 @@ class Nexus(object):
             ##print taxcount
             if taxcount>self.ntax:
                 if not self.interleave:
-                    raise NexusError, 'Too many taxa in matrix - should matrix be interleaved?'
+                    raise NexusError('Too many taxa in matrix - should matrix be interleaved?')
                 else:
                     taxcount=1
                     block_interleave=1
@@ -827,7 +832,7 @@ class Nexus(object):
             id=quotestrip(linechars.next_word())
             l=linechars.rest().strip()
             if taxlabels_present and not self._check_taxlabels(id):
-                raise NexusError,'Taxon '+id+' not found in taxlabels.'
+                raise NexusError('Taxon '+id+' not found in taxlabels.')
             chars=''
             if self.interleave:
                 #interleaved matrix
@@ -876,11 +881,11 @@ class Nexus(object):
                 if taxon_present:
                     self.matrix[taxon_present]+=iupac_seq
                 else:
-                    raise NexusError, 'Taxon %s not in first block of interleaved matrix.' % id
+                    raise NexusError('Taxon %s not in first block of interleaved matrix.' % id)
         #check all sequences for length according to nchar
         for taxon in self.matrix:
             if len(self.matrix[taxon])!=self.nchar:
-                raise NexusError,'Nchar ('+str(self.nchar)+') does not match data for taxon '+taxon
+                raise NexusError('Nchar ('+str(self.nchar)+') does not match data for taxon '+taxon)
 
     def _translate(self,options):
         self.translate={}
@@ -896,24 +901,24 @@ class Nexus(object):
                 if c is None:
                     break
                 elif c!=',':
-                    raise NexusError,'Missing \',\' in line %s.' % options
+                    raise NexusError('Missing \',\' in line %s.' % options)
             except NexusError:
                 raise
             except:
-                raise NexusError,'Format error in line %s.' % options
+                raise NexusError('Format error in line %s.' % options)
 
     def _tree(self,options):
         opts=CharBuffer(options)
         name=opts.next_word()
         if opts.next_nonwhitespace()!='=':
-            raise NexusError,'Syntax error in tree description: %s' % options[:50]
+            raise NexusError('Syntax error in tree description: %s' % options[:50])
         rooted=False
         weight=1.0
         while opts.peek_nonwhitespace()=='[':
             open=opts.next_nonwhitespace()
             symbol=opts.next()
             if symbol!='&':
-                raise NexusError,'Illegal special comment [%s...] in tree description: %s' % (symbol, options[:50])
+                raise NexusError('Illegal special comment [%s...] in tree description: %s' % (symbol, options[:50]))
             special=opts.next()
             value=opts.next_until(']')
             closing=opts.next()
@@ -958,7 +963,7 @@ class Nexus(object):
         opts=CharBuffer(options)
         name=self._name_n_vector(opts)
         if not name:
-            raise NexusError, 'Formatting error in taxpartition: %s ' % options
+            raise NexusError('Formatting error in taxpartition: %s ' % options)
         # now collect thesubbpartitions and parse them
         # subpartitons separated by commas - which unfortunately could be part of a quoted identifier...
         # this is rather unelegant, but we have to avoid double-parsing and potential change of special nexus-words
@@ -983,7 +988,7 @@ class Nexus(object):
         opts=CharBuffer(options)
         name=self._name_n_vector(opts)
         if not name:
-            raise NexusError, 'Formatting error in charpartition: %s ' % options
+            raise NexusError('Formatting error in charpartition: %s ' % options)
         # now collect thesubbpartitions and parse them
         # subpartitons separated by commas - which unfortunately could be part of a quoted identifier...
         sub=''
@@ -1009,7 +1014,7 @@ class Nexus(object):
         name=self._name_n_vector(opts,separator=separator)
         indices=self._parse_list(opts,set_type=set_type)
         if indices is None:
-            raise NexusError, 'Formatting error in line: %s ' % options
+            raise NexusError('Formatting error in line: %s ' % options)
         return name,indices
 
     def _name_n_vector(self,opts,separator='='):
@@ -1017,18 +1022,18 @@ class Nexus(object):
         rest=opts.rest()
         name=opts.next_word()
         if not name:
-            raise NexusError, 'Formatting error in line: %s ' % rest
+            raise NexusError('Formatting error in line: %s ' % rest)
         name=quotestrip(name)
         if opts.peek_nonwhitespace=='(':
             open=opts.next_nonwhitespace()
             qualifier=open.next_word()
             close=opts.next_nonwhitespace()
             if  qualifier.lower()=='vector':
-                raise NexusError, 'Unsupported VECTOR format in line %s' % (options)
+                raise NexusError('Unsupported VECTOR format in line %s' % (options))
             elif qualifier.lower()!='standard':
-                raise NexusError, 'Unknown qualifier %s in line %s' % (qualifier,options)
+                raise NexusError('Unknown qualifier %s in line %s' % (qualifier,options))
         if opts.next_nonwhitespace()!=separator:
-            raise NexusError, 'Formatting error in line: %s ' % rest
+            raise NexusError('Formatting error in line: %s ' % rest)
         return name
     
     def _parse_list(self,options_buffer,set_type):
@@ -1056,7 +1061,7 @@ class Nexus(object):
                             plain_list.extend(range(start,end+1,step)) 
                         else:
                             if type(start)==list or type(end)==list:
-                                raise NexusError, 'Name if character sets not allowed in range definition: %s' % identifier
+                                raise NexusError('Name if character sets not allowed in range definition: %s' % identifier)
                             start=self.taxlabels.index(start)
                             end=self.taxlabels.index(end)
                             taxrange=self.taxlabels[start:end+1]
@@ -1104,7 +1109,7 @@ class Nexus(object):
                 if n<=self.nchar:
                     return n-1
                 else:
-                    raise NexusError, 'Illegal character identifier: %d>nchar (=%d).' % (identifier,self.nchar)
+                    raise NexusError('Illegal character identifier: %d>nchar (=%d).' % (identifier,self.nchar))
         elif set_type==TAXSET:
             try:
                 n=int(identifier)
@@ -1115,12 +1120,12 @@ class Nexus(object):
                 elif self.taxsets and identifier in self.taxsets:
                     return self.taxsets[identifier]
                 else:
-                    raise NexusError, 'Unknown taxon identifier: %s' % identifier
+                    raise NexusError('Unknown taxon identifier: %s' % identifier)
             else:
                 if n>0 and n<=self.ntax:
                     return self.taxlabels[n-1]
                 else:
-                    raise NexusError, 'Illegal taxon identifier: %d>ntax (=%d).' % (identifier,self.ntax)
+                    raise NexusError('Illegal taxon identifier: %d>ntax (=%d).' % (identifier,self.ntax))
         else:
             raise NexusError('Unknown set specification: %s.'% set_type)
 
@@ -1191,10 +1196,10 @@ class Nexus(object):
         if not filename:
             filename=self.filename
         if [t for t in delete if not self._check_taxlabels(t)]:
-            raise NexusError, 'Unknwon taxa: %s' % ', '.join(set(delete).difference(set(self.taxlabels)))
+            raise NexusError('Unknwon taxa: %s' % ', '.join(set(delete).difference(set(self.taxlabels))))
         if interleave_by_partition:
             if not interleave_by_partition in self.charpartitions:
-                raise NexusError, 'Unknown partition: '+interleave_by_partition
+                raise NexusError('Unknown partition: '+interleave_by_partition)
             else:
                 partition=self.charpartitions[interleave_by_partition]
                 # we need to sort the partition names by starting position before we exclude characters
@@ -1213,7 +1218,7 @@ class Nexus(object):
             try:
                 fh=open(filename,'w')
             except IOError:
-                raise NexusError, 'Could not open %s for writing.' % filename
+                raise NexusError('Could not open %s for writing.' % filename)
         elif isinstance(filename,file):
             fh=filename
         if not omit_NEXUS:
@@ -1434,7 +1439,7 @@ class Nexus(object):
         if not matrix:
             matrix=self.matrix
         if [t for t in delete if not self._check_taxlabels(t)]:
-            raise NexusError, 'Unknwon taxa: %s' % ', '.join(set(delete).difference(self.taxlabels))
+            raise NexusError('Unknwon taxa: %s' % ', '.join(set(delete).difference(self.taxlabels)))
         if exclude!=[]:
             undelete=[t for t in self.taxlabels if t in matrix and t not in delete]
             if not undelete:
@@ -1476,7 +1481,7 @@ class Nexus(object):
     def add_sequence(self,name,sequence):
         """Adds a sequence to the matrix."""
         if not name:
-            raise NexusError, 'New sequence must have a name'
+            raise NexusError('New sequence must have a name')
         diff=self.nchar-len(sequence)
         if diff<0:
             self.insert_gap(self.nchar,-diff)
@@ -1540,7 +1545,7 @@ class Nexus(object):
     def _adjust_charlabels(self,exclude=None,insert=None):
         """Return adjusted indices of self.charlabels if characters are excluded or inserted."""
         if exclude and insert:
-            raise NexusError, 'Can\'t exclude and insert at the same time'
+            raise NexusError('Can\'t exclude and insert at the same time')
         if not self.charlabels:
             return None
         labels=self.charlabels.keys()

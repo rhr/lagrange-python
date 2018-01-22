@@ -1,10 +1,14 @@
+from __future__ import print_function
 import scipy
-import phylo, newick, ascii, optimize
+try:
+    from . import phylo, newick, ascii, optimize
+except ImportError:
+    import phylo, newick, ascii, optimize
 
 def log(s, outfile, tee=False):
-    print >> outfile, s
+    print(s, file=outfile)
     if tee:
-        print s
+        print(s)
 
 def summarize_splits(splits, weighted=True):
     rows = []

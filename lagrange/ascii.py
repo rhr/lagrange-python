@@ -1,20 +1,34 @@
+from __future__ import print_function
 import sys
 from array import array
-import phylo, newick
+try:
+    from . import phylo, newick
+except ImportError:
+    import phylo, newick
 
 class AsciiBuffer:
     def __init__(self, width, height):
-        self.width = width
+        self.width = int(width)
         self.height = height
-        self._b = [ array('c', ' '*width) for line in range(height) ]
+        try:
+            self._b = [ array('c', ' '*int(width)) for line in range(height) ]
+        except TypeError:
+            self._b = [ array('u', ' '*int(width)) for line in range(height) ]
 
     def putstr(self, r, c, s):
         assert r < self.height
         assert c+len(s) <= self.width, "%s %s %s '%s'" % (self.width, r, c, s)
-        self._b[r][c:c+len(s)] = array('c', s)
+        c = int(c)
+        try:
+            self._b[r][c:c+len(s)] = array('c', s)
+        except TypeError:
+            self._b[r][c:c+len(s)] = array('u', s)
 
     def __str__(self):
-        return "\n".join([ b.tostring() for b in self._b ])
+        try:
+            return "\n".join([ b.tostring() for b in self._b ])
+        except TypeError:
+            return "\n".join([ b.tostring().decode('utf8') for b in self._b ])
 
 def internodes_to_root(node):
     "count the number of internodes between node and root"
@@ -129,7 +143,7 @@ def tree2ascii(tree, unitlen=3, minwidth=None, maxwidth=None, scaled=False,
                 buf.putstr(r, node.parent.c, ":")
 
             sym = getattr(node, "hchar", "-")
-            vbar = sym*(node.c-node.parent.c)
+            vbar = sym*(int(node.c-node.parent.c))
             buf.putstr(node.r, node.parent.c, vbar)
 
         if node.istip:
@@ -145,22 +159,22 @@ def tree2ascii(tree, unitlen=3, minwidth=None, maxwidth=None, scaled=False,
 
 render = tree2ascii
 
-if __name__ == "__main__":
-    import random
-    rand = random.Random()
+## if __name__ == "__main__":
+##     import random
+##     rand = random.Random()
     
-    t = newick.parse("(foo,((bar,(dog,cat)),(shoe,(fly,(cow, bowwow)))));")
-    t = newick.parse("(((foo:4.6):5.6, (bar:6.5, baz:2.3):3.0):3.0);")
-    data = {"foo":1, "bar":0, "baz":1}
-    #print t, t.next.back, t.next.next.back, t.next.next.next.back,
-##     print t, t.next, t.next.next, t.next.next.next
-##     print t.fnodes()
-#    sys.exit()
-    i = 1
-    for n in t.iternodes():
-        #n.length = rand.random()
-        if not n.istip:
-            n.label = "n%s" % i
-            i += 1
+##     t = newick.parse("(foo,((bar,(dog,cat)),(shoe,(fly,(cow, bowwow)))));")
+##     t = newick.parse("(((foo:4.6):5.6, (bar:6.5, baz:2.3):3.0):3.0);")
+##     data = {"foo":1, "bar":0, "baz":1}
+##     #print t, t.next.back, t.next.next.back, t.next.next.next.back,
+## ##     print t, t.next, t.next.next, t.next.next.next
+## ##     print t.fnodes()
+## #    sys.exit()
+##     i = 1
+##     for n in t.iternodes():
+##         #n.length = rand.random()
+##         if not n.istip:
+##             n.label = "n%s" % i
+##             i += 1
 
-    print tree2ascii(t, scaled=1, show_internal_labels=0, data=data)
+##     print tree2ascii(t, scaled=1, show_internal_labels=0, data=data)

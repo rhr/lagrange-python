@@ -1,17 +1,19 @@
-import sys, os, nexus, scipy
-from decmodel_mp import DECModel
-from tree import Tree
+from __future__ import print_function
+import sys, os, scipy
+from . import nexus
+from .decmodel_mp import DECModel
+from .tree import Tree
 
-VERSION = file(os.path.join(os.path.dirname(__file__),
+VERSION = open(os.path.join(os.path.dirname(__file__),
                             "VERSION")).read().strip()
 
 def eval_decmodel(s):
     d = eval(s)
     v = d["lagrange_version"] 
     if v != VERSION:
-        print >> sys.stderr, "***Version mismatch: %s (expecting %s)***" \
-              % (v, VERSION)
-        print >> sys.stderr, "Things may not work as expected"
+        print("***Version mismatch: {} (expecting {})***".format(v, VERSION),
+              file=sys.stderr)
+        print("Things may not work as expected", file=sys.stderr)
     for x in ("area_labels", "taxon_range_data", "newick_trees"):
         assert x in d, "required for analysis, but missing: %s" % x
     labels = d["area_labels"]
@@ -46,7 +48,8 @@ def parse_upper_triangle(s):
     try:
         import graph
     except:
-        print >> sys.stderr, "igraph library not available; see igraph.sf.net"
+        print("igraph library not available; see igraph.sf.net",
+              file=sys.stderr)
         return
     lines = s.split("\n")
     labels = lines.pop(0).split()
@@ -68,7 +71,8 @@ def parse_lower_triangle(s, labels=None):
     try:
         import graph
     except:
-        print >> sys.stderr, "igraph library not available; see igraph.sf.net"
+        print("igraph library not available; see igraph.sf.net",
+              file=sys.stderr)
         return
     tokens = [ x.strip().split() for x in s.strip().split("\n") ]
     firstrow = tokens[0]
@@ -239,4 +243,5 @@ if __name__ == "__main__":
     #print parse_aln(file("../psychotria.aln"))
     #print file("../psychotria.data").read()
     #print parse_labeldata(file("../psychotria.data"), "KOMH")
-    print parse_matrix(file("../psychotria.matrix"))
+    #print parse_matrix(file("../psychotria.matrix"))
+    pass

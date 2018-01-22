@@ -1,8 +1,14 @@
+from __future__ import print_function
 import string, sys
 from shlex import shlex
-from phylo import Node
-from types import StringType
-from cStringIO import StringIO
+from .phylo import Node
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
+
+class NewickError(Exception):
+    pass
 
 class Tokenizer(shlex):
     """Provides tokens for parsing Newick-format trees"""
@@ -31,7 +37,7 @@ def parse(input, ttable=None):
     input is any file-like object that can be coerced into shlex,
     or a string (converted to StringIO)
     """
-    if type(input) is StringType:
+    if isinstance(input, str):
         input = StringIO(input)
     
     start_pos = input.tell()
@@ -75,11 +81,9 @@ def parse(input, ttable=None):
                 try:
                     brlen = float(token)
                 except ValueError:
-                    raise 'NewickError', \
-                          "invalid literal for branch length, '%s'" % token
+                    raise NewickError("invalid literal for branch length, '%s'" % token)
             else:
-                raise 'NewickError', \
-                      'unexpected end-of-file (expecting branch length)'
+                raise NewickError('unexpected end-of-file (expecting branch length)')
 
             node.length = brlen
         # comment
@@ -151,13 +155,13 @@ def parse_from_file(filename):
     file.close()
     return tree
 
-if __name__ == "__main__":
-    #import ascii
-    s = "(a:3,(b:1e-05,c:1.3)int:5)root;"
-    s = "(a,b,c,d,e,f,g);"
-    n = parse(s)
-    print
-    #print ascii.render(n)
-    print s
-    print to_string(n)
-    #print n.next.back.label
+## if __name__ == "__main__":
+##     #import ascii
+##     s = "(a:3,(b:1e-05,c:1.3)int:5)root;"
+##     s = "(a,b,c,d,e,f,g);"
+##     n = parse(s)
+##     print
+##     #print ascii.render(n)
+##     print s
+##     print to_string(n)
+##     #print n.next.back.label

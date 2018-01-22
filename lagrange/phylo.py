@@ -1,5 +1,10 @@
+from __future__ import print_function
 #import sets
-import tree
+try:
+    from . import tree
+except ImportError:
+    import tree
+    
 PREORDER = 0; POSTORDER = 1
 BRANCHLENGTH = 0; INTERNODES = 1
 
@@ -329,21 +334,21 @@ def ultrametricize(node):
         c = n2c[n]
         n.length = c.x - n2c[n.parent].x
 
-if __name__ == "__main__":
-    import newick, ascii, os
-    ## from numpy import array
-    ## #tree = newick.parse("(a,(b,(c,(d,e))));")
-    ## f = os.path.expanduser("~/Projects/pedic-sympatry/matrices/")
-    ## tree = eval(file(f+"garli-ml.tree").read())
-    ## treespp = tree["species"]
-    ## root = newick.parse(tree["newick"])
-    ## spp = ['alaschanica', 'cheilanthifolia', 'dichotoma', 'kansuensis',
-    ##        'oederi', 'plicata', 'przewalskii', 'remotiloba',
-    ##        'rhinanthoides', 'roylei', 'rupicola', 'scolopax']
-    ## print root.subtree_mapping(spp, clean=1)
-    root = bifid_tree(5)
-    ultrametricize(root)
-    print newick.tostring(root)
-    print ascii.render(root)
-    #print node2tipsets(root)
-    print root.mrca(("SP6","SP10", "SP18")).label
+## if __name__ == "__main__":
+##     import newick, ascii, os
+##     ## from numpy import array
+##     ## #tree = newick.parse("(a,(b,(c,(d,e))));")
+##     ## f = os.path.expanduser("~/Projects/pedic-sympatry/matrices/")
+##     ## tree = eval(file(f+"garli-ml.tree").read())
+##     ## treespp = tree["species"]
+##     ## root = newick.parse(tree["newick"])
+##     ## spp = ['alaschanica', 'cheilanthifolia', 'dichotoma', 'kansuensis',
+##     ##        'oederi', 'plicata', 'przewalskii', 'remotiloba',
+##     ##        'rhinanthoides', 'roylei', 'rupicola', 'scolopax']
+##     ## print root.subtree_mapping(spp, clean=1)
+##     root = bifid_tree(5)
+##     ultrametricize(root)
+##     print newick.tostring(root)
+##     print ascii.render(root)
+##     #print node2tipsets(root)
+##     print root.mrca(("SP6","SP10", "SP18")).label

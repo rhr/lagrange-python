@@ -1,5 +1,9 @@
+from __future__ import print_function
 import sys
-import phylo, newick, ascii
+try:
+    from . import phylo, newick, ascii
+except ImportError:
+    import phylo, newick, ascii
 import scipy
 from scipy import linalg
 expm = linalg.expm
@@ -55,7 +59,7 @@ class Tree:
             ## msg.append("Tree is:")
             ## msg.append(ascii.tree2ascii(self.root))
             #print "\n".join(msg)
-            raise Error, "\n".join(msg)
+            raise Error("\n".join(msg))
 
         self.root_age = root_age
         if root_age:
@@ -66,10 +70,9 @@ class Tree:
         for node in self.postorder_nodes:
             if node.parent:
                 if not (node.length > 0):
-                    print >> sys.stderr, \
-                          "Warning: node %s: "\
+                    print("Warning: node %s: "\
                           "changing branch length of %s to %g" \
-                          % (node.label, node.length, SHORT)
+                          % (node.label, node.length, SHORT), file=sys.stderr)
                     node.length = SHORT
 
         self.assign_node_ages()
@@ -169,17 +172,17 @@ class Tree:
 
     def print_dist_conds(self):
         "report the fractional likelihoods"
-        print "Likelihoods at root"
+        print("Likelihoods at root")
         model = self.root.model
         for i, s in enumerate(model.diststrings):
             x = self.root.dist_conditionals[i]
             if x:
                 try:
-                    print s, scipy.log(x)
+                    print(s, scipy.log(x))
                 except:
-                    print s, "Undefined"
+                    print(s, "Undefined")
             else:
-                print s, "NaN"
+                print(s, "NaN")
 
     def clear_startdist(self, node=None):
         "recursively remove startdists from all branches"

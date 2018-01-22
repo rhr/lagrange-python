@@ -1,4 +1,9 @@
-import sys, input, igraph, scipy, nchoosem
+from __future__ import print_function
+import sys, igraph, scipy
+try:
+    from . import input, nchoosem
+except ImportError:
+    import input, nchoosem
 from pprint import pprint
 
 class AreaGraph(igraph.Graph):
@@ -51,5 +56,5 @@ if __name__ == "__main__":
     #print list(dm[0])
     #pprint([ e.tuple for e in g.es ])
     for i in range(len(dm)-1):
-        print i, g.are_connected((0,i))
+        print(i, g.are_connected((0,i)))
 

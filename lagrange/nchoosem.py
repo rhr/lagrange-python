@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+from __future__ import print_function
 import sys, scipy
 
 def comb(m, n):
@@ -8,7 +8,7 @@ def comb(m, n):
     """
 
     if not m >= n >= 0:
-        raise ValueError("m >= n >= 0 required: " + `m, n`)
+        raise ValueError("m >= n >= 0 required: {}, {}".format(m, n))
     if n > (m >> 1):
         n = m-n
     if n == 0:
@@ -45,10 +45,10 @@ def comb_at_index(m, n, i):
     """
 
     if not m >= n >= 1:
-        raise ValueError("m >= n >= 1 required: " + `m, n`)
+        raise ValueError("m >= n >= 1 required: {}, {}".format(m, n))
     c = long(comb(m, n))
     if not 0 <= i < c:
-        raise ValueError("0 <= i < comb(m,n) required: " + `i, c`)
+        raise ValueError("0 <= i < comb(m,n) required: {}, {}".format(i, c))
     result = []
     # have c == comb(m, n), want comb(m-1,n-1)
     c = c * n / m
@@ -73,7 +73,7 @@ def comb_at_index(m, n, i):
 
 def iterate(M, N):
     if not M >= N >= 1:
-        raise ValueError("m >= n >= 1 required: " + `M, N`)
+        raise ValueError("m >= n >= 1 required: {}, {}".format(M, N))
     ncombs = long(comb(M, N))
     for x in xrange(ncombs):
         i = x; n = N; m = M
@@ -168,7 +168,7 @@ def main():
     ##     print i+1, x
 
     for i, x in enumerate(iterate_all_idx(m)):
-        print i, x
+        print(i, x)
     
 ##     for i in range(ncombs):
 ##         cmb = comb_at_index(m, n, i)
@@ -180,7 +180,7 @@ def subsets(s, size):
         indices = comb_at_index(m, size, i)
         yield [ s[j] for j in indices ]
 
-if __name__ == "__main__":
-    ## s = "abcdef"
-    ## print list(subsets(s, 2))
-    print len(list(dists_by_maxsize_idx(12,4)))
+## if __name__ == "__main__":
+##     ## s = "abcdef"
+##     ## print list(subsets(s, 2))
+##     print len(list(dists_by_maxsize_idx(12,4)))

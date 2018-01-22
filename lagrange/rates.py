@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys, random, time
 import scipy
 from scipy import sum
@@ -165,13 +166,13 @@ def sample_ancstates(nodes, preorder, states, fractionals, Qmap):
 
     return ancstates
 
-if __name__ == "__main__":
-    Q = Q2(0.5)
-    ## print Q2P(Q, 0.5)
-    ## print
-    print Q2P(Q2(3.16060279e-01), 0.5)
-    print
-    print q2p_test(Q2(3.16060279e-01), 0.5)
+## if __name__ == "__main__":
+##     Q = Q2(0.5)
+##     ## print Q2P(Q, 0.5)
+##     ## print
+##     print Q2P(Q2(3.16060279e-01), 0.5)
+##     print
+##     print q2p_test(Q2(3.16060279e-01), 0.5)
     #print Q2P(Q, 1.0)
 ##     from pprint import pprint
 

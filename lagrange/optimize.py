@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+from __future__ import print_function
 import sys, math
 from pprint import pprint
 import scipy
 from scipy import optimize
-import phylo
+from . import phylo
 
 LARGE = 10e10
 PMAX = 100.0
@@ -217,7 +217,7 @@ def calculate_local_for_all_nodes(node, model):
         c1, c2 = node.children
         calculate_local_for_all_nodes(c1, model)
         calculate_local_for_all_nodes(c2, model)
-        print "Node %s --> nodes %s, %s" % (node.label, c1.label, c2.label)
+        print("Node %s --> nodes %s, %s" % (node.label, c1.label, c2.label))
         results = []
         tree.clear_startdist()
         for dist in model.dists:
@@ -247,8 +247,8 @@ def calculate_local_for_all_nodes(node, model):
         for opt, params, d1, d2, root in results:
             if opt > (results[0][0] + 2):
                 break
-            print "%s, %s; -lnL=%g (P=%g); d=%g; e=%g" % \
-                  (d1, d2, opt, opt/ptotal, params[0], params[1])
+            print("%s, %s; -lnL=%g (P=%g); d=%g; e=%g" %
+                  (d1, d2, opt, opt/ptotal, params[0], params[1]))
 
 def calculate_global_for_all_nodes(node, model, d, e, skip=[], _rv={}):
     if (not node.istip) and (not node.label in skip):
@@ -256,7 +256,7 @@ def calculate_global_for_all_nodes(node, model, d, e, skip=[], _rv={}):
         c1, c2 = node.children
         calculate_global_for_all_nodes(c1, model, d, e)
         calculate_global_for_all_nodes(c2, model, d, e)
-        print ", ".join([node.label, c1.label, c2.label])
+        print(", ".join([node.label, c1.label, c2.label]))
         results = []
         #node.tree.clear_startdist()
         for disti, dist in model.enumerate_dists():
@@ -287,7 +287,7 @@ def calculate_global_for_all_nodes(node, model, d, e, skip=[], _rv={}):
             if opt > (results[0][0] + 2):
                 break
             v.append((opt, ds1, ds2))
-            print "  -lnL %g, %s, %s" % (opt, ds1, ds2)
+            print("  -lnL %g, %s, %s" % (opt, ds1, ds2))
         _rv[node.label] = v
 
     return _rv
