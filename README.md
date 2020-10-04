@@ -19,3 +19,9 @@ Analysis scripts can be created using the web-based configuration tool
 at http://www.reelab.net/lagrange. This tool lets you configure and
 download your analysis as a Python script which is then run on your
 own computer.
+
+### Quickstart
+- requires `docker` and `make`
+- `make build`
+- `make test`
+- `make run # gives shell in docker container with package installed`
