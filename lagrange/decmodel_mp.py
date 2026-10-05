@@ -1,6 +1,5 @@
-from __future__ import print_function
 import sys, string, time
-import scipy
+import numpy as np
 from . import rates
 from . import nchoosem
 
@@ -34,7 +33,7 @@ class DECModel:
         self.arange = range(nareas)
         if not labels:
             if nareas < 26:
-                self.labels = string.uppercase[:nareas]
+                self.labels = string.ascii_uppercase[:nareas]
             else:
                 self.labels = [ "A%d" % i for i in self.arange ]
         else:
@@ -42,7 +41,7 @@ class DECModel:
                    "Mismatch between number of areas and number of area labels"
             self.labels = labels
         if type(self.labels) == str or \
-               max([ len(x) for x in labels ]) == 1:
+               max([ len(x) for x in self.labels ]) == 1:
             self.labelsep = ""
         else:
             self.labelsep = "+"
@@ -58,29 +57,29 @@ class DECModel:
 
         # instantiate a matrix for each period
         # of nareas x nareas
-        self.Dmask = scipy.ones((self.nperiods, nareas, nareas), dtype=int)
+        self.Dmask = np.ones((self.nperiods, nareas, nareas), dtype=int)
         if Dmask is not None:
             # make sure default Dmask has correct dimensions
             assert Dmask.shape == (self.nperiods, nareas, nareas)
             self.Dmask = Dmask
 
-        self.Emask = scipy.ones((self.nperiods, nareas), dtype=int)
+        self.Emask = np.ones((self.nperiods, nareas), dtype=int)
         if Emask is not None:
             # make sure default Dmask has correct dimensions
             assert Emask.shape == (self.nperiods, nareas)
             self.Emask = Emask
 
         if dp_array is None:
-            self.dp_array = scipy.zeros((self.nperiods, nareas, nareas), dtype=int)
+            self.dp_array = np.zeros((self.nperiods, nareas, nareas), dtype=int)
         else:
-            self.dp_array = scipy.array(dp_array)
+            self.dp_array = np.array(dp_array)
             assert self.dp_array.shape == self.Dmask.shape
         self.dp_array_nonzero = self.dp_array.nonzero()
         self.dp_range = range(max(self.dp_array.flat))
 
         self.params = [0.01, 0.01]
         self.params += [1.0]*max(self.dp_array.flat)
-        print(list(self.dp_array.flat))
+        print(self.dp_array.flatten().tolist())
         self.setup_D()
         self.setup_E()
         #t = time.time()
@@ -164,7 +163,7 @@ class DECModel:
         if d is None:
             d = self.params[1]
         nareas = self.nareas
-        self.D = scipy.ones((self.nperiods, nareas, nareas)) * d
+        self.D = np.ones((self.nperiods, nareas, nareas)) * d
         #for period, duration in enumerate(self.periods):
         for period in self.prange:
             for i in self.arange:
@@ -173,11 +172,11 @@ class DECModel:
     def setup_E(self, e=None):
         if e is None:
             e = self.params[0]
-        self.E = scipy.ones((self.nperiods, self.nareas)) * e
+        self.E = np.ones((self.nperiods, self.nareas)) * e
 
     def setup_Q(self):
         self.Pdict = {}
-        self.Q = scipy.zeros((self.nperiods, self.ndists, self.ndists))
+        self.Q = np.zeros((self.nperiods, self.ndists, self.ndists))
         for p in range(self.nperiods):
             for i, j, dest in self.dist_dispersals:
                 d1 = self.dists[i]
@@ -186,14 +185,14 @@ class DECModel:
                     rate += self.D[p,src,dest] * self.Dmask[p,src,dest]
                 try:
                     self.Q[p,i,j] = rate
-                except ValueError:
+                except (TypeError, ValueError):
                     self.Q[p,i,j] = abs(rate)
 
             for i, j, dest in self.dist_extinctions:
                 rate = self.E[p,dest] * self.Emask[p,dest]
                 try:
                     self.Q[p,i,j] = rate
-                except ValueError:
+                except (TypeError, ValueError):
                     self.Q[p,i,j] = abs(rate)
                 
             self.set_Qdiag(p)
@@ -342,9 +341,6 @@ class Ancsplit:
         if w: w = "%.3g" % w
         return "[%s|%s]" % (d1, d2)
 
-    def __cmp__(self, other):
-        return cmp(self.likelihood, other.likelihood)
-
     def __lt__(self, other):
         return self.likelihood<other.likelihood
 
@@ -356,13 +352,13 @@ def iter_dist_splits(dist):
     if sum(dist) == 1:
         yield (dist, dist)
     else:
-        for i in scipy.nonzero(dist)[0]:
-            x = scipy.zeros((len(dist),), dtype="i")
+        for i in np.nonzero(dist)[0]:
+            x = np.zeros((len(dist),), dtype="i")
             x[i] = 1
             x = tuple(x)
             yield (x, dist)
             yield (dist, x)
-            y = tuple(scipy.array(scipy.logical_xor(dist, x), dtype="i"))
+            y = tuple(np.array(np.logical_xor(dist, x), dtype="i"))
             yield (x, y)
             if sum(y) > 1:
                 yield (y, x)
@@ -412,7 +408,7 @@ def test_conditionals(distconds, seglens, model):
     for p, seglen in enumerate(seglens):
         print("distconds", distconds)
         P = model.P(p, seglen)
-        v = scipy.zeros((model.ndists,))
+        v = np.zeros((model.ndists,))
         for i in distrange:
             # P[i] is the vector of probabilities of going from dist i
             # to all other dists

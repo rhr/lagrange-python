@@ -1,11 +1,11 @@
-from __future__ import print_function
-import sys, os, scipy
+import sys, os
+import numpy as np
 from . import nexus
 from .decmodel_mp import DECModel
 from .tree import Tree
 
-VERSION = open(os.path.join(os.path.dirname(__file__),
-                            "VERSION")).read().strip()
+with open(os.path.join(os.path.dirname(__file__), "VERSION")) as _f:
+    VERSION = _f.read().strip()
 
 def eval_decmodel(s):
     d = eval(s)
@@ -46,15 +46,15 @@ def parse_upper_triangle(s):
     and each subsequent row's first token is a label
     """
     try:
-        import graph
-    except:
-        print("igraph library not available; see igraph.sf.net",
+        from . import graph
+    except ImportError:
+        print("igraph library not available; see https://python.igraph.org",
               file=sys.stderr)
         return
     lines = s.split("\n")
     labels = lines.pop(0).split()
     nareas = len(labels)
-    dm = scipy.ones((nareas, nareas))
+    dm = np.ones((nareas, nareas))
     edges = []
     for line in lines:
         row = line.split()
@@ -69,9 +69,9 @@ def parse_upper_triangle(s):
 
 def parse_lower_triangle(s, labels=None):
     try:
-        import graph
-    except:
-        print("igraph library not available; see igraph.sf.net",
+        from . import graph
+    except ImportError:
+        print("igraph library not available; see https://python.igraph.org",
               file=sys.stderr)
         return
     tokens = [ x.strip().split() for x in s.strip().split("\n") ]
@@ -82,8 +82,8 @@ def parse_lower_triangle(s, labels=None):
         tokens = tokens[1:]
     nareas = len(tokens)+1
     #print "nareas", nareas; import sys; sys.exit()
-    dm = scipy.ones((nareas, nareas))
-    
+    dm = np.ones((nareas, nareas))
+
     edges = []
     for ai, v in enumerate(tokens):
         if v[-1] == "-":

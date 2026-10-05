@@ -1,5 +1,4 @@
-from __future__ import print_function
-import sys, scipy
+import sys
 
 def comb(m, n):
     """m, n -> number of combinations of m items, n at a time.
@@ -13,12 +12,12 @@ def comb(m, n):
         n = m-n
     if n == 0:
         return 1
-    result = long(m)
+    result = int(m)
     i = 2
     m, n = m-1, n-1
     while n:
         # assert (result * m) % i == 0
-        result = result * m / i
+        result = result * m //i
         i = i+1
         n = n-1
         m = m-1
@@ -35,7 +34,7 @@ def comb_at_index(m, n, i):
 
     Example:
     >>> for i in range(6):
-    ...    print comb_at_index(4, 2, i)
+    ...    print(comb_at_index(4, 2, i))
     [0, 1]
     [0, 2]
     [0, 3]
@@ -46,14 +45,14 @@ def comb_at_index(m, n, i):
 
     if not m >= n >= 1:
         raise ValueError("m >= n >= 1 required: {}, {}".format(m, n))
-    c = long(comb(m, n))
+    c = int(comb(m, n))
     if not 0 <= i < c:
         raise ValueError("0 <= i < comb(m,n) required: {}, {}".format(i, c))
     result = []
     # have c == comb(m, n), want comb(m-1,n-1)
-    c = c * n / m
+    c = c * n //m
     # invariant: c == comb(m-1, n-1)
-    for element in xrange(m):
+    for element in range(m):
         if i < c:
             # take this element, and n-1 from the remaining
             result.append(element)
@@ -61,12 +60,12 @@ def comb_at_index(m, n, i):
             if n == 0:
                 break
             # have c == comb(m-1,n), want comb(m-2,n-1)
-            c = c * n / (m-1)
+            c = c * n //(m-1)
         else:
             # skip this element, and take all from the remaining
             i = i-c
             # have c == comb(m-1,n-1), want comb(m-2,n-1)
-            c = c * (m-n) / (m-1)
+            c = c * (m-n) //(m-1)
         m = m-1
     assert i == 0
     return result
@@ -74,12 +73,12 @@ def comb_at_index(m, n, i):
 def iterate(M, N):
     if not M >= N >= 1:
         raise ValueError("m >= n >= 1 required: {}, {}".format(M, N))
-    ncombs = long(comb(M, N))
-    for x in xrange(ncombs):
+    ncombs = int(comb(M, N))
+    for x in range(ncombs):
         i = x; n = N; m = M
-        c = ncombs * n / m
+        c = ncombs * n //m
         result = []
-        for element in xrange(m):
+        for element in range(m):
             if i < c:
                 # take this element, and n-1 from the remaining
                 result.append(element)
@@ -87,12 +86,12 @@ def iterate(M, N):
                 if n == 0:
                     break
                 # have c == comb(m-1,n), want comb(m-2,n-1)
-                c = c * n / (m-1)
+                c = c * n //(m-1)
             else:
                 # skip this element, and take all from the remaining
                 i = i-c
                 # have c == comb(m-1,n-1), want comb(m-2,n-1)
-                c = c * (m-n) / (m-1)
+                c = c * (m-n) //(m-1)
             m = m-1
         assert i == 0
         yield tuple(result)

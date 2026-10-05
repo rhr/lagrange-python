@@ -1,17 +1,15 @@
-from __future__ import print_function
 import sys, random, time
-import scipy
-from scipy import sum
-import scipy.linalg
-array = scipy.array
-transpose = scipy.transpose
-exp = scipy.exp
-identity = scipy.identity
-dot = scipy.dot
-product = scipy.product
-log = scipy.log
-zeros = scipy.zeros
-linalg = scipy.linalg
+import numpy as np
+from numpy import sum
+from scipy import linalg
+array = np.array
+transpose = np.transpose
+exp = np.exp
+identity = np.identity
+dot = np.dot
+product = np.prod
+log = np.log
+zeros = np.zeros
 
 #from LinearAlgebra import eigenvectors, eigenvalues, inverse
 #import phylo, newick
@@ -53,7 +51,7 @@ def Q2P_old(Q, t):
     exp_D = exp(evals*t)*identity(Q.shape[0])
     C_inv = linalg.inv(C)
     P = dot(dot(C, exp_D), C_inv)
-    Psum = scipy.sum(P,1) # sum across rows, and
+    Psum = np.sum(P,1) # sum across rows, and
     P = P/Psum # divide by sum so that all elements are between 0 and 1
     return P
 
@@ -101,7 +99,7 @@ def binPdict(nodes, pi0):
 
 def fractionals(nodes, postorder, data, states, prior, Q2Pdict):
     nstates = len(states)
-    zeroed_array = zeros((nstates,), "fd").copy
+    zeroed_array = zeros((nstates,), float).copy
     
     nodeFractionalProbs = {}
 

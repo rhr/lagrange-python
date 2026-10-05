@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Lagrange"
+description = "Likelihood analysis of geographic range evolution"
+readme = "README.md"
+license = {text = "GPL"}
+authors = [{name = "Richard Ree", email = "rree@fieldmuseum.org"}]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+# needed only for lagrange.graph / input.parse_{upper,lower}_triangle
+graph = ["igraph>=0.10"]
+
+[project.urls]
+Homepage = "https://github.com/rhr/lagrange-python"
+
+[tool.setuptools]
+packages = ["lagrange"]
+
+[tool.setuptools.package-data]
+lagrange = ["VERSION"]
+
+[tool.setuptools.dynamic]
+version = {file = "lagrange/VERSION"}

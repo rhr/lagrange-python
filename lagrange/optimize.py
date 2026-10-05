@@ -1,7 +1,6 @@
-from __future__ import print_function
 import sys, math
 from pprint import pprint
-import scipy
+import numpy as np
 from scipy import optimize
 from . import phylo
 
@@ -32,7 +31,7 @@ def likelihood_de(params, model, tree):
     model.setup_Q()
     try:
         lh = tree.eval_likelihood()
-        return -(scipy.log(lh))
+        return -(np.log(lh))
     except:
         return LARGE
 
@@ -62,8 +61,8 @@ def likelihood_mp(params, model, tree):
     model.setup_Q()
     try:
         lh = tree.eval_likelihood()
-        #print params, -scipy.log(lh)
-        return -(scipy.log(lh))
+        #print params, -np.log(lh)
+        return -(np.log(lh))
     except:
         return LARGE
 
@@ -196,7 +195,7 @@ def ancdist_optimize_de(node, ancdist, model):
             if (p < 0) or (p > PMAX):
                 return LARGE
         try:
-            return -scipy.log(ancdist_likelihood_de(node, ancdist, model, d, e))
+            return -np.log(ancdist_likelihood_de(node, ancdist, model, d, e))
         except:
             return LARGE
         
@@ -230,11 +229,11 @@ def calculate_local_for_all_nodes(node, model):
                     full_output=True,disp=0
                     )
                 params, opt = v[:2]
-                #opt = scipy.log(exp(-opt) * weight) * -1
+                #opt = np.log(exp(-opt) * weight) * -1
                 ds1 = model.diststrings[model.dist2i[d1]]
                 ds2 = model.diststrings[model.dist2i[d2]]
-                root = zip(scipy.log(tree.root.dist_conditionals),
-                           model.diststrings)
+                root = list(zip(np.log(tree.root.dist_conditionals),
+                                model.diststrings))
                 root.sort(); root.reverse()
                 for i, r in enumerate(root):
                     dc, ds = r
@@ -248,7 +247,7 @@ def calculate_local_for_all_nodes(node, model):
             if opt > (results[0][0] + 2):
                 break
             print("%s, %s; -lnL=%g (P=%g); d=%g; e=%g" %
-                  (d1, d2, opt, opt/ptotal, params[0], params[1]))
+                  (d1, d2, opt, opt/ptot, params[0], params[1]))
 
 def calculate_global_for_all_nodes(node, model, d, e, skip=[], _rv={}):
     if (not node.istip) and (not node.label in skip):
@@ -268,8 +267,8 @@ def calculate_global_for_all_nodes(node, model, d, e, skip=[], _rv={}):
                 
                 ds1 = model.diststrings[model.dist2i[d1]]
                 ds2 = model.diststrings[model.dist2i[d2]]
-                root = zip(scipy.log(node.tree.root.dist_conditionals),
-                           model.diststrings)
+                root = list(zip(np.log(node.tree.root.dist_conditionals),
+                                model.diststrings))
                 root.sort(); root.reverse()
                 for i, r in enumerate(root):
                     dc, ds = r

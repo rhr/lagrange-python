@@ -1,10 +1,5 @@
-from __future__ import print_function
-#import sets
-try:
-    from . import tree
-except ImportError:
-    import tree
-    
+from . import tree
+
 PREORDER = 0; POSTORDER = 1
 BRANCHLENGTH = 0; INTERNODES = 1
 
@@ -180,7 +175,7 @@ class Node:
                 elif measure == INTERNODES:
                     dist = 1
                 else:
-                    raise "InvalidMeasure"
+                    raise ValueError("InvalidMeasure")
                 child.leaf_distances(store, measure)
                 if child.istip:
                     leaf2len[child.label] = dist
@@ -328,7 +323,7 @@ def bifid_tree(N):
     return root
 
 def ultrametricize(node):
-    import layout
+    from . import layout
     n2c = layout.calc_node_positions(node, 1.0, 1.0, scaled=False)
     for n in node.descendants():
         c = n2c[n]

@@ -1,4 +1,4 @@
-import phylo
+from . import phylo
 
 class Coordinates:
     def __init__(self):
@@ -86,7 +86,7 @@ def calc_node_positions(node, width, height, scaled=True, n2coords=None):
     return n2coords
 
 if __name__ == "__main__":
-    import newick
+    from . import newick
     node = newick.parse("(a:3,(b:2,(c:4,d:5):1,(e:3,(f:1,g:1):2):2):2);")
     for i, n in enumerate(node.iternodes()):
         if not n.istip:

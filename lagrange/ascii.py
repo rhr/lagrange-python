@@ -1,34 +1,20 @@
-from __future__ import print_function
 import sys
-from array import array
-try:
-    from . import phylo, newick
-except ImportError:
-    import phylo, newick
+from . import phylo, newick
 
 class AsciiBuffer:
     def __init__(self, width, height):
         self.width = int(width)
         self.height = height
-        try:
-            self._b = [ array('c', ' '*int(width)) for line in range(height) ]
-        except TypeError:
-            self._b = [ array('u', ' '*int(width)) for line in range(height) ]
+        self._b = [ [' ']*self.width for line in range(height) ]
 
     def putstr(self, r, c, s):
         assert r < self.height
         assert c+len(s) <= self.width, "%s %s %s '%s'" % (self.width, r, c, s)
         c = int(c)
-        try:
-            self._b[r][c:c+len(s)] = array('c', s)
-        except TypeError:
-            self._b[r][c:c+len(s)] = array('u', s)
+        self._b[r][c:c+len(s)] = list(s)
 
     def __str__(self):
-        try:
-            return "\n".join([ b.tostring() for b in self._b ])
-        except TypeError:
-            return "\n".join([ b.tostring().decode('utf8') for b in self._b ])
+        return "\n".join([ "".join(b) for b in self._b ])
 
 def internodes_to_root(node):
     "count the number of internodes between node and root"
@@ -108,7 +94,7 @@ def tree2ascii(tree, unitlen=3, minwidth=None, maxwidth=None, scaled=False,
     height = 2*nleaves - 1
 
     if minwidth and (width < minwidth):
-        unitlen = (minwidth - max_labelwidth - 2 - root_offset)/maxdepth
+        unitlen = (minwidth - max_labelwidth - 2 - root_offset)//maxdepth
         width = maxdepth*unitlen + max_labelwidth + 2 + root_offset
 
     buf = AsciiBuffer(width, height)

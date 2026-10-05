@@ -1,11 +1,7 @@
-from __future__ import print_function
-import string, sys
+import sys
+from io import StringIO
 from shlex import shlex
 from .phylo import Node
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
 
 class NewickError(Exception):
     pass
@@ -149,8 +145,8 @@ def parse_from_file(filename):
         file = sys.stdin
     else:
         file = open(filename, 'r')
-    content = string.strip(file.read())
-    treedescs = string.split(content, ';')
+    content = file.read().strip()
+    treedescs = content.split(';')
     tree = parse(treedescs[0])
     file.close()
     return tree

@@ -1,9 +1,5 @@
-from __future__ import print_function
-import scipy
-try:
-    from . import phylo, newick, ascii, optimize
-except ImportError:
-    import phylo, newick, ascii, optimize
+import numpy as np
+from . import phylo, newick, ascii, optimize
 
 def log(s, outfile, tee=False):
     print(s, file=outfile)
@@ -18,12 +14,12 @@ def summarize_splits(splits, weighted=True):
         v = [ (x.likelihood, x) for x in splits ]
     ptot = sum([ x[0] for x in v ])
     v.sort(); v.reverse()
-    opt = scipy.log(v[0][0])
+    opt = np.log(v[0][0])
 
     rows.append(["split", "lnL", "Rel.Prob"])
     sumprob = 0.0
     for L, split in v:
-        lnL = scipy.log(L)
+        lnL = np.log(L)
         relprob = (L/ptot)
         if sumprob < 0.95:
         #if (opt - lnL) < 2:

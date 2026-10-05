@@ -1,9 +1,5 @@
-from __future__ import print_function
-import sys, igraph, scipy
-try:
-    from . import input, nchoosem
-except ImportError:
-    import input, nchoosem
+import sys, igraph
+from . import input, nchoosem
 from pprint import pprint
 
 class AreaGraph(igraph.Graph):

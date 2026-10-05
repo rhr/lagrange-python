@@ -15,6 +15,13 @@ See also: Ree, R H, B R Moore, C O Webb, and M J Donoghue. 2005. A
 likelihood framework for inferring the evolution of geographic range
 on phylogenetic trees. Evolution 59(11):2299-2311.
 
+Installation
+------------
+
+Requires Python 3.10+ with NumPy and SciPy:
+
+    pip install .            # or: pip install ".[graph]" for igraph support
+
 Analysis scripts can be created using the web-based configuration tool
 at http://www.reelab.net/lagrange. This tool lets you configure and
 download your analysis as a Python script which is then run on your

@@ -1,10 +1,6 @@
-from __future__ import print_function
 import sys
-try:
-    from . import phylo, newick, ascii
-except ImportError:
-    import phylo, newick, ascii
-import scipy
+from . import phylo, newick, ascii
+import numpy as np
 from scipy import linalg
 expm = linalg.expm
 
@@ -138,7 +134,7 @@ class Tree:
         for leaf in self.leaves:
             segments = leaf.segments
             model = segments[0].model
-            cond = scipy.zeros((model.ndists,))
+            cond = np.zeros((model.ndists,))
             dist = data[leaf.label]
             cond[model.dist2i[dist]] = 1.0
             segments[0].dist_conditionals = cond
@@ -167,8 +163,7 @@ class Tree:
         evaluate fractional likelihoods at root node
         """
         ancdist_conditional_lh(self.root)
-        #print scipy.sum(self.root.dist_conditionals)
-        return scipy.sum(self.root.dist_conditionals)
+        return np.sum(self.root.dist_conditionals)
 
     def print_dist_conds(self):
         "report the fractional likelihoods"
@@ -178,7 +173,7 @@ class Tree:
             x = self.root.dist_conditionals[i]
             if x:
                 try:
-                    print(s, scipy.log(x))
+                    print(s, np.log(x))
                 except:
                     print(s, "Undefined")
             else:
@@ -270,7 +265,7 @@ def conditionals(node):
     ##         distrange = model.distrange
 
         P = model.P(seg.period, seg.duration)
-        v = scipy.zeros((model.ndists,))
+        v = np.zeros((model.ndists,))
         for i in seg.distrange:
             # P[i] is the vector of probabilities of going from dist i
             # to all other dists
@@ -298,7 +293,7 @@ def ancdist_conditional_lh(node):
         v1 = conditionals(c1)
         v2 = conditionals(c2)
 
-        distconds = scipy.zeros((model.ndists,))
+        distconds = np.zeros((model.ndists,))
         ancsplits = []
         for distidx, dist in model.enumerate_dists():
             lh = 0.0
